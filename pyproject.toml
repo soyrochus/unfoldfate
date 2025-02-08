@@ -1,0 +1,12 @@
+[project]
+name = "unfoldfate"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.12.3",
+    "fpdf>=1.7.2",
+    "nicegui>=2.10.1",
+    "requests>=2.32.3",
+]

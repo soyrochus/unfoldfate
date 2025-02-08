@@ -1,0 +1,70 @@
+back_ground:
+  - image_filename: /img/rider-waite-tarot_bg.jpg
+
+major_arcana:
+  - name: The Fool
+    description: Beginnings, innocence, spontaneity, a free spirit.
+    image_filename: /img/major_arcana_fool.png
+  - name: The Magician
+    description: Willpower, desire, creation, manifestation.
+    image_filename: /img/major_arcana_magician.png
+  - name: The High Priestess
+    description: Intuition, the subconscious mind, mystery.
+    image_filename: /img/major_arcana_priestess.png
+  - name: The Empress
+    description: Femininity, beauty, abundance, nurturing.
+    image_filename: /img/major_arcana_empress.png
+  - name: The Emperor
+    description: Authority, structure, control, fatherhood.
+    image_filename: /img/major_arcana_emperor.png
+  - name: The Hierophant
+    description: Tradition, conformity, morality, ethics.
+    image_filename: /img/major_arcana_hierophant.png
+  - name: The Lovers
+    description: Partnerships, union, duality, choice.
+    image_filename: /img/major_arcana_lovers.png
+  - name: The Chariot
+    description: Direction, control, willpower, determination.
+    image_filename: /img/major_arcana_chariot.png
+  - name: Strength
+    description: Bravery, compassion, focus, inner strength.
+    image_filename: /img/major_arcana_strength.png
+  - name: The Hermit
+    description: Contemplation, introspection, solitude.
+    image_filename: /img/major_arcana_hermit.png
+  - name: Wheel of Fortune
+    description: Changes, cycles, inevitable fate.
+    image_filename: /img/major_arcana_fortune.png
+  - name: Justice
+    description: Fairness, truth, law, clarity.
+    image_filename: /img/major_arcana_justice.png
+  - name: The Hanged Man
+    description: Sacrifice, release, martyrdom, new perspective.
+    image_filename: /img/major_arcana_hanged.png
+  - name: Death
+    description: Endings, change, transformation, transition.
+    image_filename: /img/major_arcana_death.png
+  - name: Temperance
+    description: Balance, moderation, patience, harmony.
+    image_filename: /img/major_arcana_temperance.png
+  - name: The Devil
+    description: Bondage, addiction, sexuality, materialism.
+    image_filename: /img/major_arcana_devil.png
+  - name: The Tower
+    description: Sudden upheaval, broken pride, disaster.
+    image_filename: /img/major_arcana_tower.png
+  - name: The Star
+    description: Hope, faith, rejuvenation, optimism.
+    image_filename: /img/major_arcana_star.png
+  - name: The Moon
+    description: Unconscious, illusions, intuition, uncertainty.
+    image_filename: /img/major_arcana_moon.png
+  - name: The Sun
+    description: Joy, success, vitality, celebration.
+    image_filename: /img/major_arcana_sun.png
+  - name: Judgement
+    description: Reflection, reckoning, awakening, inner calling.
+    image_filename: /img/major_arcana_judgement.png
+  - name: The World
+    description: Fulfillment, harmony, completion.
+    image_filename: /img/major_arcana_world.png
