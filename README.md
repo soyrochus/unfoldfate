@@ -1,6 +1,6 @@
 # UnfoldFate: A Tarot Reading Application
 
-UnfoldFate is a demo application for near 100% generated code by and AI. It is a Tarot reading application built using [NiceGUI](https://nicegui.io/). This project demonstrates the capabilities of the OpenAI 03-mini-high model (and equivalent) in generating functional code with minimal human intervention.
+UnfoldFate is a demo application for near 100% generated code by an AI. It is a Tarot reading application built using [NiceGUI](https://nicegui.io/). This project demonstrates the capabilities of the OpenAI 03-mini-high model in generating functional code with minimal human intervention.
 
 ## Installation
 
@@ -12,34 +12,46 @@ To install and run the program, follow these steps:
     cd unfoldfate
     ```
 
-2. Create a virtual environment and activate it:
+2. Install [uv](https://github.com/uv-org/uv):
+    Follow the instructions on the uv GitHub page to install uv.
+
+3. Create a virtual environment and install dependencies using uv:
+
     ```sh
-    python3 -m venv .venv
-    source .venv/bin/activate
+    uv pip sync
+    ```
+    This:
+    - Reads dependencies from `pyproject.toml`
+    - Installs them inside a virtual environment (`.venv/`)
+    - Ensures your environment matches the locked dependencies
+
+    To install locked dependencies only (like `poetry install --no-dev`):
+
+    ```sh
+    uv pip sync --only-locked
     ```
 
-3. Install the required dependencies:
+
+4. Activate the virtual environment:
+    - On macOS/Linux:
+        ```sh
+        source .venv/bin/activate
+        ```
+    - On Windows:
+        ```sh
+        .venv\Scripts\activate
+        ```
+
+5. Run the application:
     ```sh
-    pip install -r requirements.txt
+    python unfold_fate.py
     ```
 
-4. Run the application using `uv`:
-    ```sh
-    uv unfold_fate.py
-    ```
+![UnfoldFata Tarot Spread](unfold_fate.png)
 
 ## How It Was Generated
 
 This application was generated using the OpenAI 03-mini-high model. The process took 4 passes to get it right. The prompt history is included in the `prompt_log.txt` file for reference.
-
-## How to Run
-
-1. Ensure you have followed the installation steps above.
-2. Run the application using the command:
-    ```sh
-    uv unfold_fate.py
-    ```
-3. Open your web browser and navigate to `http://localhost:8080` to access the application.
 
 ## How It Works
 
@@ -51,6 +63,7 @@ This application was generated using the OpenAI 03-mini-high model. The process 
 ## License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
+
 
 ## Copyright
 Copyright 2025 Iwan van der Kleijn
