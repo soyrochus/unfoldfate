@@ -51,9 +51,11 @@ To install and run the program, follow these steps:
 
 ## How It Was Generated
 
-This unfold\_fate.py example as included was generated using the OpenAI 03-mini-high model. This took 4 passes to get it right. However, starting from [the original prompt ](initial_prompt.md), the first iteration was already quite good, substantially better than other models. TODO: include the prompt history for different models in the `prompt_log` directory for reference.
+This [unfold\_fate.py](blob/main/unfold_fate.py) example as included was generated using the OpenAI 03-mini-high model. This took 4 passes to get it right. However, starting from [the original prompt ](initial_prompt.md), the first iteration was already quite good, substantially better than other models. TODO: include the prompt history for different models in the `prompt_log` directory for reference.
 
 Caveat: the use of NiceGui is actually to the detriment of the model. It would seem that models have not had access to a larger enough dataset to really "know" all the ins and out of the library. A difference here is Claude which does significantly better in that respect. The solution is to provide the model with the right hints (e.g. see the last comment in the initial prompt about a “*if \_\_name\_\_ in {‘\_\_main\_\_’, ‘\_\_mp\_main\_\_’}” guard.”.* This is something which no model apart from Claude Sonnet gets right. 
+
+In order to demonstrate this, [unfold_fate_server.py](blob/main/unfold_fate_server.py) contains the server side implementation which uses "plain" FastAPI and the [Jinja2 template engine](https://jinja.palletsprojects.com/en/stable/). With the OpenAI 03-mini-high model it was possible not just to create a working version (with only one minor glitch) in a single pass, but also the translation/conversion of the NiceGUI implementation to the server-side implementation. 
 
 ## How It Works
 

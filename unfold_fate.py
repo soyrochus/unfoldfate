@@ -1,181 +1,199 @@
+#!/usr/bin/env python3
 """
-UnfoldFate - A Tarot Reading Application using NiceGUI.
+UnfoldFate - A Tarot Card Reading Application using FastAPI, Jinja2, and htmx.
 
-This version uses a YAML file with the following structure:
-
-back_ground:
-  - image_filename: /img/rider-waite-tarot_bg.jpg
-major_arcana:
-  - name: The Fool
-    description: Beginnings, innocence, spontaneity, a free spirit.
-    image_filename: /img/major_arcana_fool.png
-  ...
+This single‑file application provides a tarot card reading interface based on a
+YAML configuration (rider-waite-tarot.yaml) and images in the ./img folder.
 """
 
+from dataclasses import dataclass
+from pathlib import Path
+from typing import List, Optional
 import random
 import yaml
-from dataclasses import dataclass
-from typing import List, Protocol, Optional
 
-from nicegui import ui, app
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
-# ----------------------------------------------------------------------
-# 1. Domain Layer: Card and Session Definitions
-# ----------------------------------------------------------------------
+from jinja2 import Environment, DictLoader
+
+# ------------------------------
+# Data Classes and Session Logic
+# ------------------------------
 
 @dataclass
-class Card:
-    """
-    Represents a Major Arcana tarot card.
-
-    Attributes:
-        name (str): The name of the card (e.g., 'The Fool').
-        description (str): A brief text describing the card's meaning.
-        image_filename (str): The filename for the card's image.
-        revealed (bool): True if the card has been turned face-up; otherwise False.
-    """
+class TarotCard:
+    """Represents a single tarot card with its properties."""
     name: str
     description: str
     image_filename: str
-    revealed: bool = False
 
-class TarotSessionProtocol(Protocol):
-    def load_cards_from_yaml(self, yaml_path: str) -> None: ...
-    def refresh(self) -> None: ...
-    def select_card(self, card_id: str) -> None: ...
-    def get_cards(self) -> List[Card]: ...
-    @property
-    def background_image(self) -> str: ...
+@dataclass
+class TarotDeck:
+    """Represents the tarot deck configuration."""
+    back_ground: List[dict]
+    major_arcana: List[dict]
 
-class TarotSession(TarotSessionProtocol):
-    def __init__(self, yaml_path: str = 'rider-waite-tarot.yaml') -> None:
-        """
-        Initialize a new tarot session, loading card data from the specified YAML file.
-        """
-        self._cards: List[Card] = []
-        self._background_image: Optional[str] = None
-        self.selected_card: Optional[str] = None
-        self.clicks_enabled: bool = True  # New flag
-        self.load_cards_from_yaml(yaml_path)
-        self.refresh()
-
-    def load_cards_from_yaml(self, yaml_path: str) -> None:
-        """
-        Loads the background image and card data (Major Arcana) from a YAML file.
-        """
-        with open(yaml_path, 'r', encoding='utf-8') as f:
-            data = yaml.safe_load(f)
-            # Extract background image.
-            bg_list = data.get('back_ground', [])
-            if bg_list and len(bg_list) > 0:
-                self._background_image = bg_list[0].get('image_filename', '')
-            # Extract major arcana.
-            major_arcana = data.get('major_arcana', [])
-            for arcana in major_arcana:
-                name = arcana.get('name', 'Unknown')
-                description = arcana.get('description', '')
-                image_filename = arcana.get('image_filename', '')
-                self._cards.append(Card(name, description, image_filename))
-
-    def refresh(self) -> None:
-        for card in self._cards:
-            card.revealed = False
-        random.shuffle(self._cards)
+class TarotSession:
+    """Manages the state and logic of a tarot reading session."""
+    
+    def __init__(self, config_path: str):
+        self.config_path = config_path
+        self.deck: Optional[TarotDeck] = None
+        self.cards: List[TarotCard] = []
+        self.clicks_enabled = True
+        self.selected_card: Optional[TarotCard] = None
+        self.load_config()
+        self.shuffle_cards()
+    
+    def load_config(self) -> None:
+        """Load the deck configuration from YAML file."""
+        with open(self.config_path, 'r') as file:
+            data = yaml.safe_load(file)
+            self.deck = TarotDeck(**data)
+            self.cards = [TarotCard(**card) for card in self.deck.major_arcana]
+    
+    def shuffle_cards(self) -> None:
+        """Randomize the order of cards in the deck."""
+        random.shuffle(self.cards)
+    
+    def reset_session(self) -> None:
+        """Reset the session state for a new reading."""
+        self.clicks_enabled = True
         self.selected_card = None
-        self.clicks_enabled = True  # Re-enable clicks on refresh
+        self.shuffle_cards()
 
-    def select_card(self, card_id: str) -> None:
-        self.selected_card = card_id
-        self.clicks_enabled = False  # Disable clicks after selection
-        for card in self._cards:
-            if card.name == card_id:
-                card.revealed = True
-                break
+# Create a single global tarot session (for demo purposes)
+session_obj = TarotSession('rider-waite-tarot.yaml')
 
-    def get_cards(self) -> List[Card]:
-        return self._cards
+# ------------------------------
+# Jinja2 Templates Setup (Single File)
+# ------------------------------
 
-    @property
-    def background_image(self) -> str:
-        """
-        Return the file path for the background image of unrevealed cards.
-        """
-        return self._background_image if self._background_image else ''
+template_dict = {
+    "index.html": """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UnfoldFate</title>
+    <script src="https://unpkg.com/htmx.org@1.9.3"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+<div class="max-w-6xl mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-4 text-center">UnfoldFate</h1>
+    <!-- The New Reading button triggers a POST request; the response updates the grid and info via htmx OOB swap -->
+    <button hx-post="/new-reading" hx-swap="none" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        New Reading
+    </button>
+    <div id="cards-grid">
+        {% include 'cards_grid.html' %}
+    </div>
+    <div id="card-info" class="mt-4">
+        {% include 'card_info.html' %}
+    </div>
+</div>
+</body>
+</html>
+""",
+    "cards_grid.html": """
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+{% for idx, card in cards %}
+    <div class="card">
+        <img 
+            src="/img/{{ card.image_filename if selected_card and selected_card.name == card.name else deck_back }}" 
+            class="object-cover border border-white rounded cursor-pointer" 
+            style="width:150px; height:230px; {% if not clicks_enabled %}pointer-events: none;{% endif %}"
+            {% if clicks_enabled %}
+                hx-post="/select_card" 
+                hx-vals='{"card_index": "{{ idx }}"}' 
+                hx-swap="none"
+            {% endif %}
+        >
+    </div>
+{% endfor %}
+</div>
+""",
+    "card_info.html": """
+{% if selected_card %}
+<div>
+    <h2 class="text-xl font-bold mt-4">{{ selected_card.name }}</h2>
+    <p class="text-lg mt-2">{{ selected_card.description }}</p>
+</div>
+{% else %}
+<div></div>
+{% endif %}
+""",
+    "update_fragment.html": """
+<!-- These two divs are marked for out-of-band (OOB) swapping -->
+<div id="cards-grid" hx-swap-oob="true">
+    {% include 'cards_grid.html' %}
+</div>
+<div id="card-info" hx-swap-oob="true">
+    {% include 'card_info.html' %}
+</div>
+"""
+}
 
-# ----------------------------------------------------------------------
-# 2. UI/Presentation Layer
-# ----------------------------------------------------------------------
+env = Environment(loader=DictLoader(template_dict))
 
-# Create a global session instance.
-session = TarotSession()
+def render_template(template_name: str, context: dict) -> HTMLResponse:
+    """Render a template from the in‑memory dictionary."""
+    template = env.get_template(template_name)
+    html_content = template.render(**context)
+    return HTMLResponse(content=html_content)
 
-# Create a container with a responsive grid layout.
-cards_container = ui.row().classes('grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 p-4')
+def get_context():
+    """Collect context variables for the templates based on the current session state."""
+    return {
+        "cards": list(enumerate(session_obj.cards)),
+        "selected_card": session_obj.selected_card,
+        "clicks_enabled": session_obj.clicks_enabled,
+        "deck_back": session_obj.deck.back_ground[0]['image_filename'] if session_obj.deck and session_obj.deck.back_ground else ""
+    }
 
+# ------------------------------
+# FastAPI Application and Endpoints
+# ------------------------------
 
-name_label = ui.label("").style("display: none")
-explanation_label = ui.label("").style("display: none")
+app = FastAPI()
 
+# Mount the static directory for images
+app.mount("/img", StaticFiles(directory="img"), name="img")
 
-def render_cards() -> None:
-    """
-    Render the card grid based on the current state of the session.
-    For each card:
-      - If the card is unrevealed, display the background image.
-      - If revealed, display the card's own image.
-    The selected card has its name and explanation rendered below its image.
-    """
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    context = get_context()
+    # Although not used in our templates, passing request in context is common
+    context["request"] = request
+    return render_template("index.html", context)
 
-    cards_container.clear()
-    for card in session.get_cards():
-        image_src = card.image_filename if card.revealed else session.background_image
-        with cards_container:
-            with ui.card().classes("p-2 border border-gray-300 rounded-lg"):
-                card_image = ui.image(image_src).classes(
-                    "w-[150px] h-[230px] object-cover"
-                )
-                # Only attach click handler if clicks are enabled
-                if session.clicks_enabled:
-                    card_image.on('click', lambda e, c_id=card.name: card_clicked(c_id))
-   
+@app.post("/new-reading", response_class=HTMLResponse)
+async def new_reading():
+    # Reset the tarot session and return updated fragments
+    session_obj.reset_session()
+    context = get_context()
+    return render_template("update_fragment.html", context)
 
-def card_clicked(card_id: str) -> None:
-    """
-    Handle the event when a card is clicked.
-    Reveals only the selected card and shows its information.
-    """
-    session.select_card(card_id)
-    # Find the selected card and update labels
-    for card in session.get_cards():
-        if card.name == card_id:
-            # Update text and style separately
-            name_label.set_text(f"Name: {card.name}")
-            name_label.style("display: block")
-            
-            explanation_label.set_text(f"Explanation: {card.description}")
-            explanation_label.style("display: block")
-            break
-    render_cards()
+@app.post("/select_card", response_class=HTMLResponse)
+async def select_card(card_index: int = Form(...)):
+    # Only process the selection if clicks are enabled
+    if session_obj.clicks_enabled:
+        try:
+            idx = int(card_index)
+            if 0 <= idx < len(session_obj.cards):
+                session_obj.selected_card = session_obj.cards[idx]
+                session_obj.clicks_enabled = False
+        except Exception:
+            pass
+    context = get_context()
+    return render_template("update_fragment.html", context)
 
-def new_reading() -> None:
-    """
-    Handle the "New Reading" event to reset the session and re-render the cards.
-    """
-    session.refresh()
-    name_label.style("display: none")
-    explanation_label.style("display: none")
-    render_cards()
-# ----------------------------------------------------------------------
-# 3. Application Layout and Startup
-# ----------------------------------------------------------------------
+# ------------------------------
+# Run the Application
+# ------------------------------
 
-ui.label("UnfoldFate: Your Tarot Reading").style("font-size: 24px; font-weight: bold; margin: 20px;")
-ui.button("New Reading", on_click=new_reading).style("margin: 10px;")
-# Add the image directory as a static resource for the app.
-app.add_static_files('/img', 'img')
-
-# Initial render of the cards when the app starts.
-render_cards()
-
-if __name__ in {"__main__", "__mp_main__"}:
-    ui.run()
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("unfold_fate_server:app", host="0.0.0.0", port=8080, reload=True)

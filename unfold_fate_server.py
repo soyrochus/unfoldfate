@@ -100,14 +100,17 @@ template_dict = {
     "cards_grid.html": """
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
 {% for idx, card in cards %}
-    <div class="card cursor-pointer hover:shadow-lg transition-shadow">
-        <img src="{{ card.image_filename if selected_card and selected_card.name == card.name else deck_back }}" class="w-full h-48 object-cover">
-        {% if clicks_enabled %}
-        <!-- When a card is selected, the button sends its index to /select_card -->
-        <button hx-post="/select_card" hx-vals='{"card_index": "{{ idx }}"}' hx-swap="none" class="mt-2 w-full bg-gray-500 text-white hover:bg-gray-600">
-            Select
-        </button>
-        {% endif %}
+    <div class="card">
+        <img 
+            src="{{ card.image_filename if selected_card and selected_card.name == card.name else deck_back }}" 
+            class="object-cover border border-white rounded cursor-pointer" 
+            style="width:150px; height:230px; {% if not clicks_enabled %}pointer-events: none;{% endif %}"
+            {% if clicks_enabled %}
+                hx-post="/select_card" 
+                hx-vals='{"card_index": "{{ idx }}"}' 
+                hx-swap="none"
+            {% endif %}
+        >
     </div>
 {% endfor %}
 </div>
@@ -194,4 +197,3 @@ async def select_card(card_index: int = Form(...)):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("unfold_fate_server:app", host="0.0.0.0", port=8080, reload=True)
-
