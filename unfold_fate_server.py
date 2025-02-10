@@ -196,4 +196,4 @@ async def select_card(card_index: int = Form(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("unfolder_fate_server:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("unfold_fate_server:app", host="0.0.0.0", port=8000, reload=True)
