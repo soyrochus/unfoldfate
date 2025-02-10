@@ -98,7 +98,7 @@ template_dict = {
 </html>
 """,
     "cards_grid.html": """
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+<div class="grid grid-cols-6 gap-2">
 {% for idx, card in cards %}
     <div class="card">
         <img 
@@ -196,4 +196,4 @@ async def select_card(card_index: int = Form(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("unfold_fate_server:app", host="0.0.0.0", port=8080, reload=True)
+    uvicorn.run("unfolder_fate_server:app", host="0.0.0.0", port=8080, reload=True)
