@@ -178,4 +178,4 @@ app.add_static_files('/img', 'img')
 render_cards()
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run()
+    ui.run(favicon='img/logo.png', title='UnfoldFate: Your Tarot Reading')

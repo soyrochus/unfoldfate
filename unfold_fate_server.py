@@ -76,7 +76,8 @@ template_dict = {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>UnfoldFate</title>
+    <title>UnfoldFate (server-side)</title>
+    <link rel="icon" type="image/png" href="{{ request.url_for('img', path='/logo.png') }}">
     <script src="https://unpkg.com/htmx.org@1.9.3"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
 </head>
