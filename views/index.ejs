@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UnfoldFate (Node.js)</title>
+    <link rel="icon" type="image/png" href="/img/logo.png">
+    <script src="https://unpkg.com/htmx.org@1.9.3"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+<div class="max-w-6xl mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-4 text-center">UnfoldFate (Node.js)</h1>
+    <button hx-post="/new-reading" hx-swap="none" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        New Reading
+    </button>
+    <div id="cards-grid">
+        <%- include('cards_grid.ejs') %>
+    </div>
+    <div id="card-info" class="mt-4">
+        <%- include('card_info.ejs') %>
+    </div>
+</div>
+</body>
+</html>

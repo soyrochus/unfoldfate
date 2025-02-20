@@ -1,0 +1,14 @@
+{
+    "name": "unfold-fate",
+    "version": "1.0.0",
+    "main": "app.js",
+    "scripts": {
+      "start": "node unfold_fate_server.js"
+    },
+    "dependencies": {
+      "express": "^4.18.2",
+      "ejs": "^3.1.9",
+      "js-yaml": "^4.1.0",
+      "body-parser": "^1.20.2"
+    }
+  }

@@ -1,0 +1,16 @@
+<div class="grid grid-cols-6 gap-2">
+    <% cards.forEach(([idx, card]) => { %>
+        <div class="card">
+            <img 
+                src="<%= selectedCard && selectedCard.name === card.name ? card.image_filename : deckBack %>" 
+                class="object-cover border border-white rounded cursor-pointer" 
+                style="width:150px; height:230px; <%= !clicksEnabled ? 'pointer-events: none;' : '' %>"
+                <% if (clicksEnabled) { %>
+                    hx-post="/select_card"
+                    hx-vals='{"card_index": "<%= idx %>"}'
+                    hx-swap="none"
+                <% } %>
+            >
+        </div>
+    <% }); %>
+    </div>
