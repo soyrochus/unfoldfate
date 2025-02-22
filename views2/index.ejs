@@ -7,7 +7,7 @@
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-900 text-white text-center">
+<body class="bg-white w-4/5  text-white text-center">
 
     <h1 class="text-3xl font-bold mt-6">UnfoldFate (Node.js)</h1>
 
@@ -17,10 +17,11 @@
 
     <div id="cardGrid" class="grid grid-cols-6 gap-4 justify-center mt-6 px-4"></div>
 
-    <div class="mt-6">
-        <h2 id="cardName" class="text-2xl"></h2>
-        <p id="cardDescription" class="text-lg"></p>
-    </div>
+    <!-- Ensure name and description are always visible -->
+    <div id="cardInfo" class="mt-6"> 
+      <h2 id="cardName" class="text-black text-2xl font-bold"></h2>
+      <p id="cardDescription" class="text-black"></p>
+  </div>
 
     <script>
         let selectedCard = null;
@@ -41,18 +42,22 @@
                 });
         }
 
-        function revealCard(index) {
-            if (selectedCard !== null) return;
-            fetch(`/api/tarot/reveal/${index}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.error) return;
-                    document.getElementById(`card_${index}`).src = data.image_filename;
-                    document.getElementById("cardName").innerText = data.name;
-                    document.getElementById("cardDescription").innerText = data.description;
-                    selectedCard = index;
-                });
-        }
+    function revealCard(index) {
+      if (selectedCard !== null) return;
+      fetch(`/api/tarot/reveal/${index}`)
+          .then(response => response.json())
+          .then(data => {
+              if (data.error) return;
+              document.getElementById(`card_${index}`).src = data.image_filename;
+              document.getElementById("cardName").innerText = data.name;
+              document.getElementById("cardDescription").innerText = data.description;
+              
+              // Make the card information section visible
+              document.getElementById("cardInfo").classList.remove("hidden");
+              
+              selectedCard = index;
+        });
+}
 
         document.getElementById("newReading").addEventListener("click", function() {
             fetch("/api/tarot/reset").then(() => {
