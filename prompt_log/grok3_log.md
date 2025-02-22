@@ -1,6 +1,6 @@
 PROMPT: --------------------------------------------------------------------
 
-iven the following Python program which is a basic Tarot spreading application running fastapi & junja2 template, 
+Given the following Python program which is a basic Tarot spreading application running fastapi & junja2 template, 
 provide me with an equivalent Javascript / node.js application using the most common libraries
 reutilizate the same config file, paths for card images etc
 The Python code

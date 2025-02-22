@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnfoldFate (Node.js)</title>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white text-center">
+
+    <h1 class="text-3xl font-bold mt-6">UnfoldFate (Node.js)</h1>
+
+    <button id="newReading" class="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded">
+        New Reading
+    </button>
+
+    <div id="cardGrid" class="grid grid-cols-6 gap-4 justify-center mt-6 px-4"></div>
+
+    <div class="mt-6">
+        <h2 id="cardName" class="text-2xl"></h2>
+        <p id="cardDescription" class="text-lg"></p>
+    </div>
+
+    <script>
+        let selectedCard = null;
+
+        function loadDeck() {
+            fetch("/api/tarot")
+                .then(response => response.json())
+                .then(data => {
+                    const grid = document.getElementById("cardGrid");
+                    grid.innerHTML = "";
+                    data.cards.forEach((card, index) => {
+                        let cardDiv = document.createElement("div");
+                        cardDiv.className = "border border-gray-500 p-2 cursor-pointer";
+                        cardDiv.innerHTML = `<img id="card_${index}" src="/img/rider-waite-tarot_bg.jpg" class="w-full h-auto">`;
+                        cardDiv.onclick = () => revealCard(index);
+                        grid.appendChild(cardDiv);
+                    });
+                });
+        }
+
+        function revealCard(index) {
+            if (selectedCard !== null) return;
+            fetch(`/api/tarot/reveal/${index}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) return;
+                    document.getElementById(`card_${index}`).src = data.image_filename;
+                    document.getElementById("cardName").innerText = data.name;
+                    document.getElementById("cardDescription").innerText = data.description;
+                    selectedCard = index;
+                });
+        }
+
+        document.getElementById("newReading").addEventListener("click", function() {
+            fetch("/api/tarot/reset").then(() => {
+                selectedCard = null;
+                document.getElementById("cardName").innerText = "";
+                document.getElementById("cardDescription").innerText = "";
+                loadDeck();
+            });
+        });
+
+        loadDeck();
+    </script>
+
+</body>
+</html>
