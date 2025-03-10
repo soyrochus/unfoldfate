@@ -3,7 +3,8 @@
     "version": "1.0.0",
     "main": "app.js",
     "scripts": {
-        "start": "node unfold_fate_server.js"
+        "start": "node unfold_fate_server.js",
+        "cy:open": "cypress open"
     },
     "dependencies": {
         "body-parser": "^1.20.2",
@@ -13,5 +14,8 @@
         "js-yaml": "^4.1.0",
         "unfold-fate": "file:",
         "yamljs": "^0.3.0"
+    },
+    "devDependencies": {
+        "cypress": "^14.1.0"
     }
 }
