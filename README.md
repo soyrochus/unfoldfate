@@ -2,9 +2,12 @@
 
 UnfoldFate is a demo application for near 100% generated code by an AI. It is a Tarot reading application built using [NiceGUI](https://nicegui.io/). This project demonstrates the capabilities of the OpenAI 03-mini-high model in generating functional code with minimal human intervention.
 
+
 ## Installation
 
-To install and run the program, follow these steps:
+### Install Python Dependencies
+
+To install and run the Python part of the program, follow these steps:
 
 1. Clone the repository:
     ```sh
@@ -31,7 +34,6 @@ To install and run the program, follow these steps:
     uv pip sync --only-locked
     ```
 
-
 4. Activate the virtual environment:
     - On macOS/Linux:
         ```sh
@@ -45,6 +47,32 @@ To install and run the program, follow these steps:
 5. Run the application:
     ```sh
     python unfold_fate.py
+    ```
+
+### Install Node.js Dependencies
+
+To install and run the Node.js part of the program, follow these steps:
+
+1. Ensure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
+
+2. Navigate to the project directory:
+    ```sh
+    cd unfoldfate
+    ```
+
+3. Install the Node.js dependencies:
+    ```sh
+    npm install
+    ```
+
+4. Start the server:
+    ```sh
+    npm start
+    ```
+
+5. Open Cypress for testing:
+    ```sh
+    npm run cy:open
     ```
 
 ![UnfoldFata Tarot Spread](unfold_fate.png)
